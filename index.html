@@ -176,7 +176,7 @@
 
         .priority-buttons,
         .demand-buttons,
-        .chance-buttons,
+        .onayami-buttons,
         .Introduction-buttons,
         .delivery-buttons,
         .budgety-buttons,
@@ -189,7 +189,7 @@
 
         .priority-buttons button,
         .demand-buttons button,
-        .chance-buttons button,
+        .onayami-buttons button,
         .Introduction-buttons button,
         .delivery-buttons button,
         .budgety-buttons button,
@@ -207,7 +207,7 @@
 
         .priority-buttons button.active,
         .demand-buttons button.active,
-        .chance-buttons button.active,
+        .onayami-buttons button.active,
         .Introduction-buttons button.active,
         .delivery-buttons button.active,
         .budgety-buttons button.active,
@@ -517,8 +517,11 @@
         <div class="info-text">以下全て入力後【アンケート送信】ボタンを押してください。</div>
 
         <!--必須を追加する場合　<span class="required">必須</span>-->
-        <div class="label">お名前(漢字フルネーム/ふりがな)</div>
+        <div class="label">お名前(漢字フルネーム)</div>
         <textarea id="message" rows="1" placeholder="入力してください"></textarea> <!-- メッセージ入力フィールド -->
+
+        <div class="label">お名前(ふりがな)</div>
+        <textarea id="message3" rows="1" placeholder="入力してください"></textarea> <!-- メッセージ入力フィールド -->
 
         <div class="label">年代</div>
         <div class="priority-buttons">
@@ -532,7 +535,13 @@
         <textarea id="message2" rows="1" placeholder="入力してください"></textarea> <!-- メッセージ入力フィールド -->
 
         <div class="label">お悩み</div>
-        <textarea id="message3" rows="1" placeholder="入力してください"></textarea> <!-- メッセージ入力フィールド -->
+        <div class="onayami-buttons">
+            <button type="button" id="oneonayami" onclick="selectonayami(this)">お見合い</button>
+            <button type="button" id="twoonayami" onclick="selectonayami(this)"> 仮交際</button>
+            <button type="button" id="threeonayami" onclick="selectonayami(this)">真剣交際</button>
+            <button type="button" id="fouronayami" onclick="selectonayami(this)">会話</button>
+            <button type="button" id="fiveonayami" onclick="selectonayami(this)">婚活全般</button>
+        </div>
 
         <div class="label">気になるコンテンツ</div>
         <div class="demand-buttons">
@@ -550,6 +559,7 @@
     <script>
         let priorityCount = '';
         let demandCount = '';
+        let onayamiCount = '';
 
         // LIFF初期化
         document.addEventListener('DOMContentLoaded', function () {
@@ -597,6 +607,16 @@
             demandCount = element.innerText;
         }
 
+        function selectonayami(element) {
+            // 単一選択項目の処理コード
+            const buttons = document.querySelectorAll('.onayami-buttons button');
+            buttons.forEach(button => button.classList.remove('active'));
+
+            // 選択されたボタンだけにactiveクラスを追加
+            element.classList.add('active');
+            onayamiCount = element.innerText;
+        }
+
         //見た目変更した際に不要な物は消す！
         function submitForm() {
             const message = document.getElementById('message').value;
@@ -604,18 +624,26 @@
             const message3 = document.getElementById('message3').value;
             priorityCount: priorityCount;
             demandCount: demandCount;
+            onayamiCount: onayamiCount;
 
             const formData = {
                 message,
                 message2,
                 message3,
+                onayamiCount,
                 priorityCount,
                 demandCount,
             };
 
             // フォームデータのチェック
             if (!formData.message) {
-                alert('お名前を入力してください。');
+                alert('お名前（漢字）を入力してください。');
+                return;
+            }
+            
+            // フォームデータのチェック
+            if (!formData.message3) {
+                alert('お名前（ふりがな）を入力してください。');
                 return;
             }
             
@@ -632,8 +660,8 @@
             }
 
             // フォームデータのチェック
-            if (!formData.message3) {
-                alert('お悩みを入力してください。');
+            if (!formData.onayamiCount) {
+                alert('お悩みをご選択ください。');
                 return;
             }
 
@@ -646,7 +674,7 @@
             // LINEトークにメッセージを送信
             liff.sendMessages([{
                 type: 'text',
-                text: `≪アンケート≫\n【お名前】\n・${formData.message}\n\n【年代】\n・${formData.priorityCount}\n\n【お住まいの地域】\n・${formData.message2}\n\n【お悩み】\n・${formData.message3}\n\n【気になるコンテンツ】\n・${formData.demandCount}`
+                text: `≪アンケート≫\n【お名前（漢字）】\n・${formData.message}\n\n【お名前（ふりがな）】\n・${formData.message3}\n\n【年代】\n・${formData.priorityCount}\n\n【お住まいの地域】\n・${formData.message2}\n\n【お悩み】\n・${formData.onayamiCount}\n\n【気になるコンテンツ】\n・${formData.demandCount}`
             }]).then(() => {
                 /* メッセージ送信成功時の処理 */
                 alert('ご記入ありがとうございます。');
